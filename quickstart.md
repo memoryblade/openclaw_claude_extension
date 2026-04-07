@@ -68,10 +68,11 @@
           "claudeCodePath": "claude",        // Claude Code 可执行路径
           "codexCliPath": "codex",           // Codex CLI 可执行路径
           "maxContextMessages": 200,         // 上下文消息数上限
+          "workingDirRoot": "/Users/fish/workspace/code/openclaw_workspace", // useCC ./xxx
           "activationKeywords": {            // 自定义触发关键词
-            "claudeCode": ["使用 Claude Code", ...],
-            "codexCli": ["使用 Codex", ...],
-            "deactivate": ["退出", ...]
+            "claudeCode": ["useCC"],
+            "codexCli": ["useCX"],
+            "deactivate": ["退出"]
           }
         }
       }
