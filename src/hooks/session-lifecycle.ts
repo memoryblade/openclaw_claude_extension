@@ -7,8 +7,11 @@ export function registerSessionLifecycleHooks(
   stateManager: SessionStateManager,
   executorManager: ExecutorManager,
 ): void {
-  // T011: session_start — initialize SessionExecutorState
+  // T011: session_start — initialize SessionExecutorState and register key mapping
   api.on('session_start', async (event) => {
+    if (event.sessionKey) {
+      stateManager.registerSessionKey(event.sessionKey, event.sessionId);
+    }
     await stateManager.get(event.sessionId);
     // get() already initializes to default if missing
   });
@@ -24,6 +27,9 @@ export function registerSessionLifecycleHooks(
     } catch (err) {
       api.logger.warn(`hybrid-executor: error during session_end cleanup: ${String(err)}`);
     } finally {
+      if (event.sessionKey) {
+        stateManager.unregisterSessionKey(event.sessionKey, event.sessionId);
+      }
       stateManager.delete(event.sessionId);
     }
   });

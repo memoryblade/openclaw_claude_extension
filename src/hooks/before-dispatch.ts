@@ -14,16 +14,19 @@ export function registerBeforeDispatchHook(
   api.on(
     'before_dispatch',
     async (event, ctx) => {
-      const sessionId = ctx.sessionKey ?? event.sessionKey ?? '';
-      if (!sessionId) {
-        api.logger.warn('hybrid-executor: before_dispatch — sessionId empty, skipping');
+      const sessionKey = ctx.sessionKey ?? event.sessionKey ?? '';
+      if (!sessionKey) {
+        api.logger.warn('hybrid-executor: before_dispatch — sessionKey empty, skipping');
         return { handled: false };
       }
+
+      // Resolve the stable sessionKey to the current per-session sessionId.
+      // This ensures each new session (via /new) gets its own state and CC session.
+      const sessionId = stateManager.resolveId(sessionKey);
 
       const state = await stateManager.get(sessionId);
       const message = event.content;
       const intent = intentDetector.detect(message);
-      const sessionKey = ctx.sessionKey ?? event.sessionKey ?? sessionId;
 
       api.logger.info(
         `hybrid-executor: before_dispatch — intent=${intent.type} activeExecutor=${state.activeExecutor} sessionId=${sessionId.slice(0, 8)} msg=${JSON.stringify(message.slice(0, 60))}`,
