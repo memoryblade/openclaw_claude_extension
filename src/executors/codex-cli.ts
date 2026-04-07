@@ -32,11 +32,11 @@ export class CodexCliAdapter implements ExecutorAdapter {
     return codexSessionId;
   }
 
-  async forward(executorSessionId: string, userMessage: string, _isFirstCall: boolean): Promise<string> {
-    return this.runResumeCall(executorSessionId, userMessage);
+  async forward(executorSessionId: string, userMessage: string, _isFirstCall: boolean, cwd?: string): Promise<string> {
+    return this.runResumeCall(executorSessionId, userMessage, cwd);
   }
 
-  private runFirstCall(prompt: string): Promise<{ sessionId: string; text: string }> {
+  private runFirstCall(prompt: string, cwd?: string): Promise<{ sessionId: string; text: string }> {
     return new Promise((resolve, reject) => {
       const chunks: string[] = [];
       let sessionId = '';
@@ -45,6 +45,7 @@ export class CodexCliAdapter implements ExecutorAdapter {
 
       const proc = spawn(this.config.codexCliPath, ['exec', '--json', prompt], {
         stdio: ['ignore', 'pipe', 'pipe'],
+        cwd,
       });
 
       const timer = setTimeout(() => {
@@ -89,7 +90,7 @@ export class CodexCliAdapter implements ExecutorAdapter {
     });
   }
 
-  private runResumeCall(executorSessionId: string, userMessage: string): Promise<string> {
+  private runResumeCall(executorSessionId: string, userMessage: string, cwd?: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const chunks: string[] = [];
       let stderr = '';
@@ -98,7 +99,7 @@ export class CodexCliAdapter implements ExecutorAdapter {
       const proc = spawn(
         this.config.codexCliPath,
         ['exec', 'resume', executorSessionId, '--json', userMessage],
-        { stdio: ['ignore', 'pipe', 'pipe'] },
+        { stdio: ['ignore', 'pipe', 'pipe'], cwd },
       );
 
       const timer = setTimeout(() => {

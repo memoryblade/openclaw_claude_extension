@@ -6,6 +6,7 @@ import { SessionStateManager } from './session-state.js';
 import { ContextTransfer } from './context-transfer.js';
 import { ClaudeCodeAdapter } from './executors/claude-code.js';
 import { CodexCliAdapter } from './executors/codex-cli.js';
+import { resolveWorkingDir } from './resolve-working-dir.js';
 
 export class ExecutorManager {
   private readonly stateManager: SessionStateManager;
@@ -19,6 +20,7 @@ export class ExecutorManager {
     contextTransfer: ContextTransfer,
     claudeCode: ClaudeCodeAdapter,
     codexCli: CodexCliAdapter,
+    private readonly config: import('./executors/types.js').PluginConfig,
   ) {
     this.stateManager = stateManager;
     this.contextTransfer = contextTransfer;
@@ -35,6 +37,7 @@ export class ExecutorManager {
     ocSessionId: string,
     sessionKey: string,
     targetExecutor: ExecutorType.ClaudeCode | ExecutorType.CodexCli,
+    workingDir?: string,
   ): Promise<string> {
     const state = await this.stateManager.get(ocSessionId);
     const context = await this.contextTransfer.buildFromSession(sessionKey);
@@ -51,6 +54,11 @@ export class ExecutorManager {
       lastSessionId ?? undefined,
     );
 
+    const resolvedCwd = resolveWorkingDir(
+      workingDir ?? this.config.workingDir,
+      this.config.workingDirRoot,
+    );
+
     const resumed = lastSessionId != null;
     const updated: SessionExecutorState = {
       ...state,
@@ -60,6 +68,7 @@ export class ExecutorManager {
       activatedAt: Date.now(),
       messageCount: 0,
       conversationLog: [],
+      workingDir: resolvedCwd,
     };
     await this.stateManager.set(ocSessionId, updated);
 
@@ -83,7 +92,7 @@ export class ExecutorManager {
 
     const adapter = state.activeExecutor === ExecutorType.ClaudeCode ? this.claudeCode : this.codexCli;
     const isFirstCall = !state.executorSessionInitialized;
-    const response = await adapter.forward(state.executorSessionId, userMessage, isFirstCall);
+    const response = await adapter.forward(state.executorSessionId, userMessage, isFirstCall, state.workingDir);
 
     const userMsg: Message = {
       role: 'user',
@@ -157,6 +166,8 @@ export class ExecutorManager {
       activatedAt: Date.now(),
       messageCount: 0,
       conversationLog: [],
+      // carry over the existing workingDir when switching between executors
+      workingDir: state.workingDir,
     };
     await this.stateManager.set(ocSessionId, updated);
 

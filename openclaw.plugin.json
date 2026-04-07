@@ -26,6 +26,14 @@
         "default": 200,
         "description": "Maximum messages to retain when degrading context transfer"
       },
+      "workingDir": {
+        "type": "string",
+        "description": "Default working directory for executor subprocesses. Absolute or relative to workingDirRoot."
+      },
+      "workingDirRoot": {
+        "type": "string",
+        "description": "Root directory used to resolve relative workingDir values."
+      },
       "activationKeywords": {
         "type": "object",
         "properties": {

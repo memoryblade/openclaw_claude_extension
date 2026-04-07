@@ -20,6 +20,8 @@ function buildConfig(pluginConfig: Record<string, unknown> | undefined): PluginC
       typeof cfg['maxContextMessages'] === 'number'
         ? cfg['maxContextMessages']
         : DEFAULT_CONFIG.maxContextMessages,
+    workingDir: typeof cfg['workingDir'] === 'string' ? cfg['workingDir'] : undefined,
+    workingDirRoot: typeof cfg['workingDirRoot'] === 'string' ? cfg['workingDirRoot'] : undefined,
     activationKeywords: {
       claudeCode:
         Array.isArray((cfg['activationKeywords'] as Record<string, unknown>)?.['claudeCode'])
@@ -48,7 +50,7 @@ export default definePluginEntry({
     const contextTransfer = new ContextTransfer(api, config);
     const claudeCode = new ClaudeCodeAdapter(config, contextTransfer);
     const codexCli = new CodexCliAdapter(config, contextTransfer);
-    const executorManager = new ExecutorManager(api, stateManager, contextTransfer, claudeCode, codexCli);
+    const executorManager = new ExecutorManager(api, stateManager, contextTransfer, claudeCode, codexCli, config);
     const intentDetector = new IntentDetector(config);
 
     // T014: register before_dispatch (priority 100), session_start, session_end

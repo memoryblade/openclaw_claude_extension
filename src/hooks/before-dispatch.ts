@@ -60,7 +60,7 @@ export function registerBeforeDispatchHook(
           if (state.activeExecutor !== ExecutorType.Default) {
             confirmMsg = await executorManager.switchExecutor(sessionId, sessionKey, ExecutorType.ClaudeCode);
           } else {
-            confirmMsg = await executorManager.activate(sessionId, sessionKey, ExecutorType.ClaudeCode);
+            confirmMsg = await executorManager.activate(sessionId, sessionKey, ExecutorType.ClaudeCode, intent.workingDir);
           }
           return { handled: true, text: confirmMsg };
         } catch (err) {
@@ -83,7 +83,7 @@ export function registerBeforeDispatchHook(
           if (state.activeExecutor !== ExecutorType.Default) {
             confirmMsg = await executorManager.switchExecutor(sessionId, sessionKey, ExecutorType.CodexCli);
           } else {
-            confirmMsg = await executorManager.activate(sessionId, sessionKey, ExecutorType.CodexCli);
+            confirmMsg = await executorManager.activate(sessionId, sessionKey, ExecutorType.CodexCli, intent.workingDir);
           }
           return { handled: true, text: confirmMsg };
         } catch (err) {

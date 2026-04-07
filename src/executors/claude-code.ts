@@ -21,7 +21,7 @@ export class ClaudeCodeAdapter implements ExecutorAdapter {
     return resumeSessionId ?? sessionId;
   }
 
-  async forward(executorSessionId: string, userMessage: string, isFirstCall: boolean): Promise<string> {
+  async forward(executorSessionId: string, userMessage: string, isFirstCall: boolean, cwd?: string): Promise<string> {
     const sessionFlag = isFirstCall
       ? ['--session-id', executorSessionId]
       : ['--resume', executorSessionId];
@@ -32,10 +32,10 @@ export class ClaudeCodeAdapter implements ExecutorAdapter {
       '--output-format', 'stream-json',
       userMessage,
     ];
-    return this.runCli(args);
+    return this.runCli(args, cwd);
   }
 
-  private runCli(args: string[]): Promise<string> {
+  private runCli(args: string[], cwd?: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const chunks: string[] = [];
       let stderr = '';
@@ -43,6 +43,7 @@ export class ClaudeCodeAdapter implements ExecutorAdapter {
 
       const proc = spawn(this.config.claudeCodePath, args, {
         stdio: ['ignore', 'pipe', 'pipe'],
+        cwd,
       });
 
       const timer = setTimeout(() => {

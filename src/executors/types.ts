@@ -22,6 +22,8 @@ export interface SessionExecutorState {
   conversationLog: Message[];
   lastClaudeCodeSessionId: string | null;
   lastCodexCliSessionId: string | null;
+  /** Resolved absolute working directory for the active executor process. */
+  workingDir?: string;
 }
 
 export interface ContextPayload {
@@ -38,14 +40,22 @@ export interface ExecutorAdapter {
   activate(sessionId: string, context?: ContextPayload, resumeSessionId?: string): Promise<string>;
   /** Forward a user message to the executor and return the response.
    *  isFirstCall: true on the very first forward after activate — adapter uses --session-id.
-   *  false on subsequent calls — adapter uses --resume. */
-  forward(executorSessionId: string, userMessage: string, isFirstCall: boolean): Promise<string>;
+   *  false on subsequent calls — adapter uses --resume.
+   *  cwd: resolved absolute working directory for the subprocess. */
+  forward(executorSessionId: string, userMessage: string, isFirstCall: boolean, cwd?: string): Promise<string>;
 }
 
 export interface PluginConfig {
   claudeCodePath: string;
   codexCliPath: string;
   maxContextMessages: number;
+  /** Default working directory for executor subprocesses.
+   *  Absolute path → used as-is.
+   *  Relative path → resolved against workingDirRoot (or process.cwd()).
+   *  Omitted → process.cwd(). */
+  workingDir?: string;
+  /** Root directory used to resolve relative workingDir values. */
+  workingDirRoot?: string;
   activationKeywords: {
     claudeCode: string[];
     codexCli: string[];
