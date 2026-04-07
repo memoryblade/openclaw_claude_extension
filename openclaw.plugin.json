@@ -1,0 +1,51 @@
+{
+  "id": "hybrid-executor",
+  "name": "Hybrid Executor",
+  "description": "Routes messages to Claude Code or Codex CLI based on user intent",
+  "main": "dist/index.js",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "claudeCodePath": {
+        "type": "string",
+        "description": "Claude Code CLI executable path",
+        "default": "claude"
+      },
+      "codexCliPath": {
+        "type": "string",
+        "description": "Codex CLI executable path",
+        "default": "codex"
+      },
+      "maxContextMessages": {
+        "type": "number",
+        "default": 200,
+        "description": "Maximum messages to retain when degrading context transfer"
+      },
+      "activationKeywords": {
+        "type": "object",
+        "properties": {
+          "claudeCode": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["使用 Claude Code", "用 Claude Code", "切换到 Claude Code", "use claude code", "switch to claude code"]
+          },
+          "codexCli": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["使用 Codex", "用 Codex", "切换到 Codex", "use codex", "switch to codex"]
+          },
+          "deactivate": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["切换回来", "退出", "回到默认", "switch back", "exit", "go back"]
+          }
+        }
+      }
+    }
+  }
+}

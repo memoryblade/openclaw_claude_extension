@@ -1,0 +1,25 @@
+{
+  "name": "hybrid-executor",
+  "version": "0.1.0",
+  "description": "OpenClaw plugin for hybrid executor routing between default, Claude Code, and Codex CLI",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "openclaw": {
+    "extensions": ["dist/index.js"]
+  },
+  "peerDependencies": {
+    "openclaw": "*"
+  },
+  "devDependencies": {
+    "openclaw": "workspace:*",
+    "vitest": "^3.0.0",
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}
