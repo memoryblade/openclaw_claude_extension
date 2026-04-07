@@ -80,9 +80,10 @@
   }
 
   ---
-  更新插件
+  安装&更新插件
 
   修改源码后：
   cd /Users/fish/workspace/code/openclaw/openclaw_with_cc/ai-assistant
   pnpm build
+  cd ~/.openclaw/extensions/ && ln -s /Users/fish/workspace/code/openclaw/openclaw_with_cc/ai-assistant hybrid-executor
   openclaw gateway restart
